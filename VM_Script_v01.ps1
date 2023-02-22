@@ -112,5 +112,5 @@ Start-Sleep -Seconds 120
 write-host 'Waiting 2 minutes for resources to be remove from Azure'
 # Create virtual machine with Managed Disk on dedicated host specific earlier
 
-New-AzVM -VM $VirtualMachine -ResourceGroupName ($VMName).ResourceGroupName -Location ($VMName).Location
+New-AzVM -VM $VirtualMachine -ResourceGroupName ($VMName).ResourceGroupName -Location ($VMName).Location -Zones $VMName.Zones
 write-host 'Creating New Virtual On Dedicated Host'
