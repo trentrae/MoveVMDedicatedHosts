@@ -29,7 +29,7 @@ $VMName.HardwareProfile.VmSize
 
 $dhInfo = Get-AzHost -ResourceGroupName $resourceGroupName -Name $hostname -HostGroupName $HGName -InstanceView
 
-$hostGrouInfo = Get-AzHostGroup -ResourceGroupName $resourceGroupName -HostGroupName $HGName
+$hostGroupInfo = Get-AzHostGroup -ResourceGroupName $resourceGroupName -HostGroupName $HGName
 
 #test and see if they are in the same Zone
 if (!([string]::IsNullOrEmpty($hostGroupInfo.Zones) -AND [string]::IsNullOrEmpty($VMName.Zones)))
