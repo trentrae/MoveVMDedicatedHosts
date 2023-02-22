@@ -109,7 +109,8 @@ Remove-AzVM -Name $VM -ResourceGroupName $VMName.ResourceGroupName -Force
 
 #wait 2 minutes for everything to be fully removed from azure
 Start-Sleep -Seconds 120
-
+write-host 'Waiting 2 minutes for resources to be remove from Azure'
 # Create virtual machine with Managed Disk on dedicated host specific earlier
 
 New-AzVM -VM $VirtualMachine -ResourceGroupName ($VMName).ResourceGroupName -Location ($VMName).Location
+write-host 'Creating New Virtual On Dedicated Host'
