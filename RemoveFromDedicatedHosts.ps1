@@ -1,6 +1,5 @@
 # Specific VM Name that you want to move from IaaS to Dedicated Host
 $subscription = 'subscriptionid'
-#$tenantid = ''
 $VM = 'vm name'
 $KVName = 'key vault name'
 $hostname = 'dedicatedhostname'
