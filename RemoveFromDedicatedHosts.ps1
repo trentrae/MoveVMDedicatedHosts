@@ -1,25 +1,21 @@
 # Specific VM Name that you want to move from IaaS to Dedicated Host
-$subscription = ''
+$subscription = 'subscriptionid'
 #$tenantid = ''
 $VM = 'vm-test-004'
+$KVName = 'keyvaultname'
+$hostname = 'dedicatedhostname'
+$HGName = 'dedicatedhostgroupname'
+$resourceGroupName = 'resourcegroupname of dedicated host'
+$DiskSetEncryptName = 'DiskEncryptionSet'
+$MoveToResourceGroupName ='resourcegroupname to move vm to'
 
 #select the proper subscription
 Set-AzContext -SubscriptionName $subscription
-#Set-AzContext -TenantId '7489987e-92f9-4f08-9828-2228010ca26f'
-
-# Specific your Dedicated Host, Host Group and Resource Group details where dedicated host has been deployed
-$hostname = ''
-$HGName = ''
-$resourceGroupName = ''
-
 
 # KeyVault and Disk Encryption
-$KVName = ''
+
 $KeyVault = Get-AzKeyVault -VaultName $KVName
-$DiskSetEncryptName = ''
 $DiskEncryptionSet = Get-AzDiskEncryptionSet -Name $DiskSetEncryptName
-# Resource group this VM will reside in.
-$MoveToResourceGroupName =''
 
 # below commands captures the existing VM configuration
 
@@ -61,29 +57,26 @@ $vmdisks = ($VMName).StorageProfile.DataDisks
 
 # Initialize virtual machine configuration
 $dhost = Get-AzHost -Name $hostname -ResourceGroupName $resourceGroupName -HostGroupName $HGName
-$virtualMachineSize = $VMName.HardwareProfile.VmSize
+$VirtualMachine = New-AzVMConfig -VMName $virtualMachineName -HostId $dhost.id -VMSize $virtualMachineSize
 
 # Use the Managed Disk Resource Id to attach it to the virtual machine
 # Change the OS type to linux, if OS disk have linux OS installed
 
 $VirtualMachine = Set-AzVMOSDisk -VM $VirtualMachine -ManagedDiskId $osdisk.Id -CreateOption Attach -Windows -DiskEncryptionSetId $DiskEncryptionSet.Id
 
-#$count = 0
-for ($lun=0;$lun -le 2;$lun=$lun+1)
-  {
+$count = 0
   foreach ($disk in $vmDisks)
     {
-
-      $ddisk = Get-AzDisk -Name $disk.name
-      $ddisks = Add-AzVMDataDisk -CreateOption Attach -Lun $lun -VM $VirtualMachine -ManagedDiskId $ddisk.Id -DiskEncryptionSetId $DiskEncryptionSet.Id
-      #$count++
+     write-host $disk.name
+     $ddisk = Get-AzDisk -Name $disk.name
+     $ddisks = Add-AzVMDataDisk -CreateOption Attach -Lun $count -VM $VirtualMachine -ManagedDiskId $ddisk.Id -DiskEncryptionSetId $DiskEncryptionSet.Id
+     $count++
     
     }
-}
 
 #$VirtualMachine = Set-AzVmSecurityProfile -VM $VirtualMachine -SecurityType "TrustedLaunch" 
 #$VirtualMachine= Set-AzVmUefi -VM $VirtualMachine -EnableVtpm $true -EnableSecureBoot $true
-$VirtualMachine = Add-AzVMNetworkInterface -VM $VirtualMachine -Id (($VMName).NetworkProfile.NetworkInterfaces).id -Primary
+$VirtualMachine = Add-AzVMNetworkInterface -VM $VirtualMachine -Id (($VMName).NetworkProfile.NetworkInterfaces).id -Primary 
 
 # Delete existing VM from Azure IaaS
 write-host "Deleting Dedicated Host VM Creating new IaaS "
@@ -94,10 +87,12 @@ write-host "Wait 2 minutes for Azure Resources to clean up"
 Start-Sleep -Seconds 120
 
 # Create virtual machine with Managed Disk on dedicated host specific earlier
-write-host "Creating New IaaS VM"
-New-AzVM -VM $VirtualMachine -ResourceGroupName $MoveToResourceGroupName -Location ($VMName).Location -Zone $VMName.zones
+write-host "Creating New IaaS VM in"$MoveToResource
+New-AzVM -VM $VirtualMachine -ResourceGroupName $MoveToResourceGroupName -Location ($VMName).Location -Zone $VMName.zones 
  
 
 
 #Set-AzVMExtension -Name AzureMonitorWindowsAgent -ExtensionType AzureMonitorWindowsAgent -Publisher Microsoft.Azure.Monitor -ResourceGroupName $MoveToResourceGroupName -VMName $VM -Location $vmname.location -TypeHandlerVersion 1.12 -EnableAutomaticUpgrade $true
+
+#Set-AzVMExtension -Name AzureMonitorLinuxAgent -ExtensionType AzureMonitorLinuxAgent -Publisher Microsoft.Azure.Monitor -ResourceGroupName $MoveToResourceGroupName -VMName $VM -Location $vmname.location -TypeHandlerVersion 1.12 -EnableAutomaticUpgrade $true
 
