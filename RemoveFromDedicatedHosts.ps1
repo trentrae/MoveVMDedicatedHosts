@@ -1,8 +1,8 @@
 # Specific VM Name that you want to move from IaaS to Dedicated Host
 $subscription = 'subscriptionid'
 #$tenantid = ''
-$VM = 'vm-test-004'
-$KVName = 'keyvaultname'
+$VM = 'vm name'
+$KVName = 'key vault name'
 $hostname = 'dedicatedhostname'
 $HGName = 'dedicatedhostgroupname'
 $resourceGroupName = 'resourcegroupname of dedicated host'
@@ -76,7 +76,7 @@ $count = 0
 
 #$VirtualMachine = Set-AzVmSecurityProfile -VM $VirtualMachine -SecurityType "TrustedLaunch" 
 #$VirtualMachine= Set-AzVmUefi -VM $VirtualMachine -EnableVtpm $true -EnableSecureBoot $true
-$VirtualMachine = Add-AzVMNetworkInterface -VM $VirtualMachine -Id (($VMName).NetworkProfile.NetworkInterfaces).id -Primary 
+$VirtualMachine = Add-AzVMNetworkInterface -VM $VirtualMachine -Id (($VMName).NetworkProfile.NetworkInterfaces).id  
 
 # Delete existing VM from Azure IaaS
 write-host "Deleting Dedicated Host VM Creating new IaaS "
